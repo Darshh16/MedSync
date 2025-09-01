@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block start %}
+<div class="container mt-4">
+    <!-- Username display -->
+    <div class="welcome-banner mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="fw-bold">Book Medicines</h4>
+            <p class="text-muted mb-0">Welcome, {{request.user}}</p>
+        </div>
+        <a href="{% url 'cart' %}" class="btn btn-outline-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <span id="cart-count" class="ms-2">0</span>
+        </a>
+    </div>
+
+    <div class="mb-4">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </span>
+            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search Medical...">
+        </div>
+    </div>
+    
+
+    <!-- Events Display Section -->
+    <div class="row g-4">
+        {% for event in events %}
+        <div class="col-md-6 col-lg-4 searchable-item">
+            <div class="card h-100 border-0 rounded-3 shadow-sm hover-shadow-lg transition-shadow">
+                {% if event.image %}
+                <div class="card-img-wrapper position-relative">
+                    <img src="{{ event.image.url }}" class="card-img-top rounded-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-img-overlay d-flex align-items-start justify-content-end">
+                        <span class="badge {% if event.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ event.status }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold mb-3 text-muted">{{ event.name }}</h5>
+                    <p class="card-text flex-grow-1 text-dark">{{ event.description|truncatewords:20 }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            
+                            <span class="h5 mb-0 muted text-dark">₹{{ event.price }}</span>
+                           
+                        </div>
+                        <div class="d-grid gap-2">
+                            
+                            <button class="btn btn-glow add-to-cart" data-product-name="{{event.name}}" data-price="{{event.price}}">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info bg-primary bg-opacity-10 text-primary border-0">
+                No Medicals Nearby.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="position-fixed bottom-0 end-0 m-4">
+    <a href="/map/"><button id="show-map-btn" class="btn btn-primary ">Show Map
+        
+    </button></a>
+    <a href="/map/"><button id="show-map-btn" class="btn btn-primary ">Request Consultancy
+        
+    </button></a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Add to cart functionality
+    $('.add-to-cart').click(function() {
+        const button = $(this);
+        const productName = button.data('product-name');
+        const price = button.data('price');
+        
+        $.ajax({
+            url: '{% url "add_to_cart" %}',
+            type: 'POST',
+            data: {
+                'product_name': productName,
+                'price': price,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#cart-count').text(response.cart_count);
+                    button.html('Added to Cart').addClass('btn-success').removeClass('btn-primary');
+                    setTimeout(() => {
+                        button.html('Book Now').addClass('btn-primary').removeClass('btn-success');
+                    }, 2000);
+                }
+            }
+        });
+    });
+
+    // Search functionality
+    $('#searchInput').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase().trim();
+        
+        $('.searchable-item').each(function() {
+            const $item = $(this);
+            const titleText = $item.find('.card-title').text().toLowerCase();
+            const descriptionText = $item.find('.card-text').text().toLowerCase();
+            const priceText = $item.find('.h5').text().toLowerCase();
+            
+            const searchableText = `${titleText} ${descriptionText} ${priceText}`;
+            const matches = searchableText.includes(searchTerm);
+            
+            $item.toggle(matches);
+        });
+
+        // Show "No results found" message if no items are visible
+        const visibleItems = $('.searchable-item:visible').length;
+        if (visibleItems === 0 && searchTerm !== '') {
+            if ($('#no-results').length === 0) {
+                $('.row.g-4').after('<div id="no-results" class="text-center mt-4"><p class="text-muted">No matches found</p></div>');
+            }
+        } else {
+            $('#no-results').remove();
+        }
+    });
+});
+</script>
+
+<style>
+.hover-shadow-lg {
+    transition: box-shadow 0.3s ease-in-out;
+}
+.hover-shadow-lg:hover {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+.transition-shadow {
+    transition: all 0.3s ease;
+}
+.card {
+    background: var(--dark-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.btn-glow {
+    background-color: #0d6efd;
+    color: white;
+    transition: all 0.3s ease;
+}
+.btn-glow:hover {
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

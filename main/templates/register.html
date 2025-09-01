@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block start %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5 sea-green-gradient">
+                    <!-- Logo and Brand Name -->
+                    <div class="text-center mb-4">
+                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background-color: white; border-radius: 50%;">
+                            <i class="bi bi-capsule" style="font-size: 2rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 class="fw-bold text-white">Create MedSync Account</h4>
+                        <p class="text-white-50">Please fill in your details</p>
+                    </div>
+
+                    <!-- Alert Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show mb-4 rounded-3" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Registration Form -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-white">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                                        <i class="bi bi-person" style="color: var(--primary-color);"></i>
+                                    </span>
+                                    <input type="text" name="first_name" class="form-control bg-white border-start-0 rounded-end-3" placeholder="First name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-white">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                                        <i class="bi bi-person" style="color: var(--primary-color);"></i>
+                                    </span>
+                                    <input type="text" name="last_name" class="form-control bg-white border-start-0 rounded-end-3" placeholder="Last name" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-white">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                                    <i class="bi bi-at" style="color: var(--primary-color);"></i>
+                                </span>
+                                <input type="text" name="username" class="form-control bg-white border-start-0 rounded-end-3" placeholder="Choose a username" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-white">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                                    <i class="bi bi-lock" style="color: var(--primary-color);"></i>
+                                </span>
+                                <input type="password" name="password" class="form-control bg-white border-start-0 rounded-end-3" placeholder="Create a password" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-lg text-success fw-bold rounded-3" style="background-color: white;">Create Account</button>
+                        </div>
+
+                        <!-- Login Link -->
+                        <p class="text-center mb-0">
+                            Already have an account? 
+                            <a href="/login/" class="text-decoration-none fw-bold text-white">Sign In</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Terms and Privacy -->
+            <div class="text-center mt-4">
+                <p class="text-muted small mb-0">
+                    By creating an account, you agree to our 
+                    <a href="#" class="text-decoration-none" style="color: var(--secondary-color);">Terms of Service</a> and 
+                    <a href="#" class="text-decoration-none" style="color: var(--secondary-color);">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Medical Green Theme Custom CSS -->
+<style>
+    /* Rounded card with gradient */
+    .card {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    
+    /* Create gradient background */
+    .sea-green-gradient {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+    }
+    
+    .form-control, .input-group-text, .btn {
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        border-color: var(--accent-color);
+    }
+    
+    .input-group-text {
+        color: var(--text-color);
+    }
+    
+    /* Add more rounded corners to all elements */
+    .rounded-3 {
+        border-radius: 0.5rem !important;
+    }
+    
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+    
+    .rounded-start-3 {
+        border-top-left-radius: 0.5rem !important;
+        border-bottom-left-radius: 0.5rem !important;
+    }
+    
+    .rounded-end-3 {
+        border-top-right-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+    
+    /* Custom button styles */
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background-color: var(--light-bg);
+    }
+    
+    /* Inverted text colors for better contrast */
+    .text-white-50 {
+        opacity: 0.8;
+    }
+    
+    a.text-white:hover {
+        color: var(--accent-color) !important;
+        text-decoration: underline !important;
+    }
+</style>
+
+{% endblock %}
