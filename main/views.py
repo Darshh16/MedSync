@@ -38,7 +38,7 @@ from django.http import HttpResponseForbidden
 
 
 # Configure Gemini API
-API_KEY = "AIzaSyAOIxGJvzpiehT6i8en7RJL6ovvFRqA_ng"
+API_KEY = " "
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
